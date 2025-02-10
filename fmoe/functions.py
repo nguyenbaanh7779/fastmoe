@@ -60,6 +60,7 @@ def prepare_forward(gate, num_expert, world_size):
         world_size: number of workers that hold different experts.
         comm: the communicator of all workers in the expert-parallel group.
     """
+    assert(gate.is_contiguous())
     pos, local_expert_count, global_expert_count = count_by_gate(gate, 
             num_expert, world_size)
     with torch.no_grad():
