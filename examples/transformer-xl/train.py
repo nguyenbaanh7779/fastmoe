@@ -155,7 +155,7 @@ if args.d_embed < 0:
     args.d_embed = args.d_model
 
 assert args.ext_len >= 0, 'extended context length must be non-negative'
-assert args.batch_size % args.batch_chunk == 0
+assert args.batch_size % args.batch_chunk == 0, 'batch_size must be divided by batch_chuck'
 
 args.work_dir = '{}-{}'.format(args.work_dir, args.dataset)
 args.work_dir = os.path.join(args.work_dir, time.strftime('%Y%m%d-%H%M%S'))
@@ -184,6 +184,23 @@ if args.fp16:
             args.fp16 = False
 
 device = torch.device('cuda' if args.cuda else 'cpu')
+
+###############################################################################
+# Get data
+###############################################################################
+import datasets
+from tqdm import tqdm
+
+if args.dataset == "wt103":
+    ds = datasets.load_dataset("Salesforce/wikitext", "wikitext-103-raw-v1")
+    for type_ds in ["train", "validation", "test"]:
+        lines = ds[type_ds]["text"]
+        if not os.path.exists(args.data):
+            os.makedirs(args.data)
+        with open(os.path.join(args.data, f"{type_ds}.txt"), "w", encoding="utf-8") as f:
+            for line in tqdm(lines, desc=f"Saving {type_ds}.txt", unit="lines"):
+                f.write(line)
+        f.close()
 
 ###############################################################################
 # Load data

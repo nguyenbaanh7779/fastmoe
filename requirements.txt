@@ -2,3 +2,6 @@ torch
 numpy
 ninja
 dm-tree
+# add by me
+apex
+datasets
